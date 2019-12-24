@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blog.Core.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.Core.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // [ApiExplorerSettings(IgnoreApi = true)]
     public class ValuesController : ControllerBase
     {
         // GET api/values
@@ -29,11 +31,21 @@ namespace Blog.Core.Controllers
             return "value";
         }
 
-        // POST api/values
+        /// <summary>
+       /// post
+       /// </summary>
+       /// <param name="love">model实体类参数</param>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post(Love love)
         {
+
         }
+
+        // POST api/values
+        // [HttpPost]
+        // public void Post([FromBody] string value)
+        // {
+        // }
 
         // PUT api/values/5
         [HttpPut("{id}")]

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -49,6 +50,10 @@ namespace Blog.Core
                 var baseDomin=AppDomain.CurrentDomain.BaseDirectory;
                 var combinePath=Path.Join(baseDomin,"Blog.Core.xml");
                 c.IncludeXmlComments(combinePath);
+
+                 var xmlModelPath = Path.Combine(baseDomin, "Blog.Core.Model.xml");//这个就是Model层的xml文件名
+                 c.IncludeXmlComments(xmlModelPath);
+
             });
 
             #endregion
@@ -68,6 +73,8 @@ namespace Blog.Core
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "ApiHelp V1");
                     c.RoutePrefix="";
+                      // 将swagger首页，设置成我们自定义的页面，记得这个字符串的写法：解决方案名.index.html
+                    // c.IndexStream = () => GetType().GetTypeInfo().Assembly.GetManifestResourceStream("Blog.Core.Index.html");//这里是配合MiniProfiler进行性能监控的，《文章：完美基于AOP的接口性能分析》，如果你不需要，可以暂时先注释掉，不影响大局。
                 });
 
                 #endregion
