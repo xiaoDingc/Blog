@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Blog.Core.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.Core.Controllers
@@ -14,6 +15,7 @@ namespace Blog.Core.Controllers
     {
         // GET api/values
         [HttpGet]
+        // [Authorize(Roles = "AdminAndClient")]
         public ActionResult<IEnumerable<string>> Get()
         {
             return new string[] { "value1", "value2" };
@@ -28,7 +30,7 @@ namespace Blog.Core.Controllers
         [HttpGet("{id}")]
         public ActionResult<string> Get(int id)
         {
-            return "value";
+            return id.ToString();
         }
 
         /// <summary>
