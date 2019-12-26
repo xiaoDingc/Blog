@@ -19,6 +19,12 @@ namespace Blog.Core.Controllers
    // [Authorize(policy:"Admin")]
     public class BlogController : ControllerBase
     {
+        private  readonly  IAdvertisementServices advertisementServices;
+
+        public BlogController(IAdvertisementServices advertisementServices)
+        {
+            this.advertisementServices = advertisementServices;
+        }
         // GET: api/Blog
         // [HttpGet]
         // public IEnumerable<string> Get()
@@ -36,7 +42,6 @@ namespace Blog.Core.Controllers
         [HttpGet]
         public async Task<List<Advertisement>> Get(int id)
         {
-            IAdvertisementServices advertisementServices = new AdvertisementServices();
             return await advertisementServices.Query(d => d.Id == id);
         } 
 

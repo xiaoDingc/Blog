@@ -19,6 +19,12 @@ using Swashbuckle.AspNetCore.Swagger;
 
 namespace Blog.Core
 {
+    using Autofac;
+    using Autofac.Extensions.DependencyInjection;
+
+    using Blog.Core.IServices;
+    using Blog.Core.Services;
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -29,7 +35,7 @@ namespace Blog.Core
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
@@ -134,6 +140,25 @@ namespace Blog.Core
                     }
                 };
             });
+
+            // 实例化autofac容器
+            var builder = new ContainerBuilder();
+          
+            var assemblyServices=Assembly.Load("Blog.Core.Services");
+
+            builder.RegisterAssemblyTypes(assemblyServices).AsImplementedInterfaces();
+
+            var assemblyRepository=Assembly.Load("Blog.Core.Repository");
+            // builder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>();
+            builder.RegisterAssemblyTypes(assemblyRepository).AsImplementedInterfaces();
+
+            
+            // 将services填充到Autofac容器生成器中
+            builder.Populate(services);
+
+            // 使用已进行的组件登记创建新容器
+            var applicationContainer= builder.Build();
+            return new AutofacServiceProvider(applicationContainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
