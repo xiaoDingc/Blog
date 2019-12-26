@@ -45,6 +45,14 @@
             职能
             </summary>
         </member>
+        <member name="M:Blog.Core.Controllers.BlogController.Get(System.Int32)">
+            <summary>
+            Sum接口
+            </summary>
+            <param name="i"></param>
+            <param name="j"></param>
+            <returns></returns>
+        </member>
         <member name="M:Blog.Core.Controllers.ValuesController.Get(System.Int32)">
             <summary>
             获取id
