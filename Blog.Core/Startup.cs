@@ -21,8 +21,11 @@ namespace Blog.Core
 {
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using Autofac.Extras.DynamicProxy;
 
+    using Blog.Core.AOP;
     using Blog.Core.IServices;
+    using Blog.Core.MemoryCacheHelper;
     using Blog.Core.Services;
 
     public class Startup
@@ -141,18 +144,25 @@ namespace Blog.Core
                 };
             });
 
+            services.AddScoped<ICaching, MemoryCaching>();//记得把缓存注入！！！
             // 实例化autofac容器
             var builder = new ContainerBuilder();
           
+            
+            builder.RegisterType(typeof(BlogCacheAOP));
+            builder.RegisterType(typeof(BlogLogAOP));
             var assemblyServices=Assembly.Load("Blog.Core.Services");
 
-            builder.RegisterAssemblyTypes(assemblyServices).AsImplementedInterfaces();
+            builder.RegisterAssemblyTypes(assemblyServices).AsImplementedInterfaces()
+                .InstancePerLifetimeScope()
+                .EnableInterfaceInterceptors()//引用Autofac.Extras.DynamicProxy;
+                // .InterceptedBy(typeof(BlogLogAOP));
+                .InterceptedBy(typeof(BlogCacheAOP),typeof(BlogLogAOP));
 
             var assemblyRepository=Assembly.Load("Blog.Core.Repository");
             // builder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>();
             builder.RegisterAssemblyTypes(assemblyRepository).AsImplementedInterfaces();
 
-            
             // 将services填充到Autofac容器生成器中
             builder.Populate(services);
 

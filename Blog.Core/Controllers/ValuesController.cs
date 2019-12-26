@@ -8,30 +8,36 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.Core.Controllers
 {
+    using Blog.Core.IServices;
+
     [Route("api/[controller]")]
     [ApiController]
     // [ApiExplorerSettings(IgnoreApi = true)]
     public class ValuesController : ControllerBase
     {
-        // GET api/values
-        [HttpGet]
-        // [Authorize(Roles = "AdminAndClient")]
-        public ActionResult<IEnumerable<string>> Get()
+        private  readonly  IAdvertisementServices advertisementServices;
+
+        public ValuesController(IAdvertisementServices advertisementServices)
         {
-            return new string[] { "value1", "value2" };
+            this.advertisementServices = advertisementServices;
         }
 
-        // GET api/values/5
         /// <summary>
-        /// 获取id
+        /// The get.日志测试
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        [HttpGet]
+        public async Task<List<Advertisement>> Get(int id)
         {
-            return id.ToString();
-        }
+            return await advertisementServices.Query(d => d.Id == id);
+        } 
+
+
 
         /// <summary>
        /// post

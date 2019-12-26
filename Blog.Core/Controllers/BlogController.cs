@@ -9,6 +9,7 @@ namespace Blog.Core.Controllers
 {
     using Blog.Core.IServices;
     using Blog.Core.Model;
+    using Blog.Core.Model.Models;
     using Blog.Core.Services;
 
     using Microsoft.AspNetCore.Authorization;
@@ -20,10 +21,12 @@ namespace Blog.Core.Controllers
     public class BlogController : ControllerBase
     {
         private  readonly  IAdvertisementServices advertisementServices;
+        private  readonly  IBlogArticleServices blogArticleServices;
 
-        public BlogController(IAdvertisementServices advertisementServices)
+        public BlogController(IAdvertisementServices advertisementServices, IBlogArticleServices blogArticleServices)
         {
             this.advertisementServices = advertisementServices;
+            this.blogArticleServices = blogArticleServices;
         }
         // GET: api/Blog
         // [HttpGet]
@@ -39,17 +42,23 @@ namespace Blog.Core.Controllers
         /// <param name="j"></param>
         /// <returns></returns>
         // [AllowAnonymous]
-        [HttpGet]
-        public async Task<List<Advertisement>> Get(int id)
-        {
-            return await advertisementServices.Query(d => d.Id == id);
-        } 
+        // [HttpGet]
+        // public async Task<List<Advertisement>> Get(int id)
+        // {
+        //     return await advertisementServices.Query(d => d.Id == id);
+        // } 
 
         // POST: api/Blog
         [HttpPost]
         public void Post([FromBody] string value)
         {
-
+           
+        }
+        [HttpGet]
+        [Route("GetBlogs")]
+        public async Task<List<BlogArticle>> getBlogs()
+        {
+            return await this.blogArticleServices.getBlogs();
         }
 
         // PUT: api/Blog/5

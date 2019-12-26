@@ -4,6 +4,22 @@
         <name>Blog.Core</name>
     </assembly>
     <members>
+        <member name="T:Blog.Core.AOP.BlogCacheAOP">
+            <summary>
+            面向切面的缓存使用
+            </summary>
+        </member>
+        <member name="T:Blog.Core.AOP.BlogLogAOP">
+            <summary>
+            拦截器BlogLogAOP 继承IInterceptor接口
+            </summary>
+        </member>
+        <member name="M:Blog.Core.AOP.BlogLogAOP.Intercept(Castle.DynamicProxy.IInvocation)">
+            <summary>
+            实例化IInterceptor唯一方法 
+            </summary>
+            <param name="invocation">包含被拦截方法的信息</param>
+        </member>
         <member name="M:Blog.Core.Appsettings.app(System.String[])">
             <summary>
             封装要操作的字符
@@ -45,7 +61,7 @@
             职能
             </summary>
         </member>
-        <member name="M:Blog.Core.Controllers.BlogController.Get(System.Int32)">
+        <member name="M:Blog.Core.Controllers.BlogController.Post(System.String)">
             <summary>
             Sum接口
             </summary>
@@ -55,16 +71,30 @@
         </member>
         <member name="M:Blog.Core.Controllers.ValuesController.Get(System.Int32)">
             <summary>
-            获取id
+            The get.日志测试
             </summary>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="id">
+            The id.
+            </param>
+            <returns>
+            The <see cref="T:System.Threading.Tasks.Task"/>.
+            </returns>
         </member>
         <member name="M:Blog.Core.Controllers.ValuesController.Post(Blog.Core.Model.Love)">
             <summary>
             post
             </summary>
             <param name="love">model实体类参数</param>
+        </member>
+        <member name="T:Blog.Core.MemoryCacheHelper.ICaching">
+            <summary>
+            简单的缓存接口，只有查询和添加，以后会进行扩展
+            </summary>
+        </member>
+        <member name="T:Blog.Core.MemoryCacheHelper.MemoryCaching">
+            <summary>
+            实例化缓存接口ICaching
+            </summary>
         </member>
     </members>
 </doc>
