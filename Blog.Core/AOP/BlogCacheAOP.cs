@@ -2,7 +2,7 @@
 {
     using System;
     using System.Linq;
-
+    using Blog.Core.Common;
     using Blog.Core.MemoryCacheHelper;
 
     using Castle.DynamicProxy;
@@ -21,22 +21,29 @@
         //Intercept方法是拦截的关键所在，也是IInterceptor接口中的唯一定义
         public void Intercept(IInvocation invocation)
         {
-            //获取自定义缓存键
-            var cacheKey = CustomCacheKey(invocation);
-            //根据key获取相应的缓存值
-            var cacheValue = _cache.Get(cacheKey);
-            if (cacheValue != null)
+            var method=invocation.MethodInvocationTarget ?? invocation.Method;
+            var qCachingAttribute = method.GetCustomAttributes(true).FirstOrDefault(x=>x.GetType()==typeof(CachingAttribute)) as CachingAttribute;
+
+            if (qCachingAttribute != null)
             {
-                //将当前获取到的缓存值，赋值给当前执行方法
-                invocation.ReturnValue = cacheValue;
-                return;
-            }
-            //去执行当前的方法
-            invocation.Proceed();
-            //存入缓存
-            if (!string.IsNullOrWhiteSpace(cacheKey))
-            {
-                _cache.Set(cacheKey, invocation.ReturnValue);
+                //获取自定义缓存键
+                var cacheKey = CustomCacheKey(invocation);
+                //根据key获取相应的缓存值
+                var cacheValue = _cache.Get(cacheKey);
+                if (cacheValue != null)
+                {
+                    //将当前获取到的缓存值，赋值给当前执行方法
+                    invocation.ReturnValue = cacheValue;
+                    return;
+                }
+
+                //去执行当前的方法
+                invocation.Proceed();
+                //存入缓存
+                if (!string.IsNullOrWhiteSpace(cacheKey))
+                {
+                    _cache.Set(cacheKey, invocation.ReturnValue);
+                }
             }
         }
 

@@ -7,13 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.Core", "Blog.Core\Blog
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.Core.Model", "Blog.Core.Model\Blog.Core.Model.csproj", "{7A1A55CE-3257-4A66-91C5-F6504D5C1D16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blog.Core.IRepository", "IRepository\Blog.Core.IRepository.csproj", "{14ECC0E4-D8DF-4FE6-ABB2-C9ACB5AEC52A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.Core.IRepository", "IRepository\Blog.Core.IRepository.csproj", "{14ECC0E4-D8DF-4FE6-ABB2-C9ACB5AEC52A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blog.Core.Repository", "Blog.Core.Repository\Blog.Core.Repository.csproj", "{E4098425-797B-44FE-B355-12122BB87C88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.Core.Repository", "Blog.Core.Repository\Blog.Core.Repository.csproj", "{E4098425-797B-44FE-B355-12122BB87C88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blog.Core.IServices", "Blog.Core.IServices\Blog.Core.IServices.csproj", "{F0434200-FE48-47F8-B594-4B731A67E673}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.Core.IServices", "Blog.Core.IServices\Blog.Core.IServices.csproj", "{F0434200-FE48-47F8-B594-4B731A67E673}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blog.Core.Services", "Blog.Core.Services\Blog.Core.Services.csproj", "{3D02A6C4-4394-45B6-A9BF-D629711851D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.Core.Services", "Blog.Core.Services\Blog.Core.Services.csproj", "{3D02A6C4-4394-45B6-A9BF-D629711851D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blog.Core.Common", "Blog.Core.Common\Blog.Core.Common.csproj", "{D2706B58-69B5-4FB5-B000-8665B48F8588}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{3D02A6C4-4394-45B6-A9BF-D629711851D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D02A6C4-4394-45B6-A9BF-D629711851D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D02A6C4-4394-45B6-A9BF-D629711851D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2706B58-69B5-4FB5-B000-8665B48F8588}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2706B58-69B5-4FB5-B000-8665B48F8588}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2706B58-69B5-4FB5-B000-8665B48F8588}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2706B58-69B5-4FB5-B000-8665B48F8588}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
