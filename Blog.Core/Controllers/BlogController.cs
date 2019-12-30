@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blog.Core.Common.Redis;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,22 +12,23 @@ namespace Blog.Core.Controllers
     using Blog.Core.Model;
     using Blog.Core.Model.Models;
     using Blog.Core.Services;
-
     using Microsoft.AspNetCore.Authorization;
 
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-   // [Authorize(policy:"Admin")]
+    // [Authorize(policy:"Admin")]
     public class BlogController : ControllerBase
     {
-        private  readonly  IAdvertisementServices advertisementServices;
-        private  readonly  IBlogArticleServices blogArticleServices;
+        private readonly IAdvertisementServices advertisementServices;
+        private readonly IBlogArticleServices blogArticleServices;
+        private readonly IRedisCacheManager redisCacheManager;
 
-        public BlogController(IAdvertisementServices advertisementServices, IBlogArticleServices blogArticleServices)
+        public BlogController(IAdvertisementServices advertisementServices, IBlogArticleServices blogArticleServices, IRedisCacheManager redisCacheManager)
         {
             this.advertisementServices = advertisementServices;
             this.blogArticleServices = blogArticleServices;
+            this.redisCacheManager = redisCacheManager;
         }
         // GET: api/Blog
         // [HttpGet]
@@ -34,7 +36,7 @@ namespace Blog.Core.Controllers
         // {
         //     return new string[] { "value1", "value2" };
         // }
-        
+
         /// <summary>
         /// Sum接口
         /// </summary>
@@ -50,20 +52,36 @@ namespace Blog.Core.Controllers
 
         // POST: api/Blog
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post([FromBody]string value)
         {
-           
         }
+
         [HttpGet]
         [Route("GetBlogs")]
         public async Task<List<BlogArticle>> getBlogs()
         {
-            return await this.blogArticleServices.getBlogs();
+            var connetct = Appsettings.app(new string[]
+            {
+                "AppSettings",
+                "RedisCaching",
+                "ConnectionString"
+            });
+            List<BlogArticle> blogArticles = new List<BlogArticle>();
+            if (redisCacheManager.Get<Object>("Redis.Blog") != null)
+            {
+                blogArticles = redisCacheManager.Get<List<BlogArticle>>("Redis.Blog");
+            }
+            else
+            {
+                blogArticles = await this.blogArticleServices.getBlogs();
+                redisCacheManager.Set("Redis.Blog", blogArticles, TimeSpan.FromHours(2));
+            }
+            return blogArticles;
         }
 
         // PUT: api/Blog/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void Put(int id, [FromBody]string value)
         {
         }
 

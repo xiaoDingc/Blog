@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Blog.Core.Common.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -145,6 +146,7 @@ namespace Blog.Core
             });
 
             services.AddScoped<ICaching, MemoryCaching>();//记得把缓存注入！！！
+            services.AddScoped<IRedisCacheManager, RedisCacheManager>();//这里说下，如果是自己的项目，个人更建议使用单例模式 
             // 实例化autofac容器
             var builder = new ContainerBuilder();
           
