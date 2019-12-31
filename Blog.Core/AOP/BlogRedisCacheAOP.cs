@@ -8,9 +8,9 @@ using Castle.DynamicProxy;
 
 namespace Blog.Core.AOP
 {
-    public class BlogRedisCacheAOP:IInterceptor
+    public class BlogRedisCacheAOP : IInterceptor
     {
-         //通过注入的方式，把缓存操作接口通过构造函数注入
+        //通过注入的方式，把缓存操作接口通过构造函数注入
         private IRedisCacheManager _redisCacheManager;
 
         /// <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
@@ -19,8 +19,8 @@ namespace Blog.Core.AOP
             _redisCacheManager = redisCacheManager;
         }
 
-      //Intercept方法是拦截的关键所在，也是IInterceptor接口中的唯一定义
-       public void Intercept(IInvocation invocation)
+        //Intercept方法是拦截的关键所在，也是IInterceptor接口中的唯一定义
+        public void Intercept(IInvocation invocation)
         {
             var method = invocation.MethodInvocationTarget ?? invocation.Method;
             //对当前方法的特性验证
@@ -30,7 +30,7 @@ namespace Blog.Core.AOP
                 //获取自定义缓存键，这个和Memory内存缓存是一样的，不细说
                 var cacheKey = CustomCacheKey(invocation);
                 //核心1：注意这里和之前不同，是获取的string值，之前是object
-                var cacheValue = _cache.GetValue(cacheKey);
+                var cacheValue = _redisCacheManager.GetValue(cacheKey);
                 if (cacheValue != null)
                 {
                     //将当前获取到的缓存值，赋值给当前执行方法
@@ -40,6 +40,7 @@ namespace Blog.Core.AOP
                     {
                         return;
                     }
+
                     object response;
                     if (type != null && typeof(Task).IsAssignableFrom(type))
                     {
@@ -50,7 +51,6 @@ namespace Blog.Core.AOP
                             // 核心3，直接序列化成 dynamic 类型，之前我一直纠结特定的实体
                             dynamic temp = Newtonsoft.Json.JsonConvert.DeserializeObject(cacheValue, resultType);
                             response = Task.FromResult(temp);
-
                         }
                         else
                         {
@@ -61,12 +61,13 @@ namespace Blog.Core.AOP
                     else
                     {
                         // 核心4，要进行 ChangeType
-                        response = System.Convert.ChangeType(_cache.Get<object>(cacheKey), type);
+                        response = System.Convert.ChangeType(_redisCacheManager.Get<object>(cacheKey), type);
                     }
 
                     invocation.ReturnValue = response;
                     return;
                 }
+
                 //去执行当前的方法
                 invocation.Proceed();
 
@@ -86,15 +87,45 @@ namespace Blog.Core.AOP
                     {
                         response = invocation.ReturnValue;
                     }
+
                     if (response == null) response = string.Empty;
                     // 核心5：将获取到指定的response 和特性的缓存时间，进行set操作
-                    _cache.Set(cacheKey, response, TimeSpan.FromMinutes(qCachingAttribute.AbsoluteExpiration));
+                    _redisCacheManager.Set(cacheKey, response, TimeSpan.FromMinutes(qCachingAttribute.AbsoluteExpiration));
                 }
             }
             else
             {
-                invocation.Proceed();//直接执行被拦截方法
+                invocation.Proceed(); //直接执行被拦截方法
             }
+        }
+
+
+        //自定义缓存键
+        private string CustomCacheKey(IInvocation invocation)
+        {
+            var typeName = invocation.TargetType.Name;
+            var methodName = invocation.Method.Name;
+            var methodArguments = invocation.Arguments.Select(GetArgumentValue).Take(3).ToList(); //获取参数列表，我最多需要三个即可
+
+            string key = $"{typeName}:{methodName}:";
+            foreach (var param in methodArguments)
+            {
+                key += $"{param}:";
+            }
+
+            return key.TrimEnd(':');
+        }
+
+        //object 转 string
+        private string GetArgumentValue(object arg)
+        {
+            if (arg is int || arg is long || arg is string)
+                return arg.ToString();
+
+            if (arg is DateTime)
+                return ((DateTime) arg).ToString("yyyyMMddHHmmss");
+
+            return "";
         }
     }
 }

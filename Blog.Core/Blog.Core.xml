@@ -20,6 +20,9 @@
             </summary>
             <param name="invocation">包含被拦截方法的信息</param>
         </member>
+        <member name="M:Blog.Core.AOP.BlogRedisCacheAOP.#ctor(Blog.Core.Common.Redis.IRedisCacheManager)">
+            <summary>Initializes a new instance of the <see cref="T:System.Object"></see> class.</summary>
+        </member>
         <member name="M:Blog.Core.Appsettings.app(System.String[])">
             <summary>
             封装要操作的字符

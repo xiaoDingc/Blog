@@ -151,15 +151,16 @@ namespace Blog.Core
             var builder = new ContainerBuilder();
           
             
-            builder.RegisterType(typeof(BlogCacheAOP));
+            // builder.RegisterType(typeof(BlogCacheAOP));
             builder.RegisterType(typeof(BlogLogAOP));
+            builder.RegisterType(typeof(BlogRedisCacheAOP));
             var assemblyServices=Assembly.Load("Blog.Core.Services");
 
             builder.RegisterAssemblyTypes(assemblyServices).AsImplementedInterfaces()
                 .InstancePerLifetimeScope()
                 .EnableInterfaceInterceptors()//引用Autofac.Extras.DynamicProxy;
                 // .InterceptedBy(typeof(BlogLogAOP));
-                .InterceptedBy(typeof(BlogCacheAOP),typeof(BlogLogAOP));
+                .InterceptedBy(typeof(BlogLogAOP),typeof(BlogRedisCacheAOP));
 
             var assemblyRepository=Assembly.Load("Blog.Core.Repository");
             // builder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>();
