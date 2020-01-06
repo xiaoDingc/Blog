@@ -1,4 +1,6 @@
-﻿namespace Blog.Core.IServices
+﻿using Blog.Core.Model.ViewModels;
+
+namespace Blog.Core.IServices
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -9,5 +11,6 @@
     public interface IBlogArticleServices:IBaseServices<BlogArticle>
     {
         Task<List<BlogArticle>>  getBlogs();
+        Task<BlogViewModels>  getBlogDetails(int id);
     }
 }

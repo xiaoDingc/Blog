@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Blog.Core.AuthHelper;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,20 +12,30 @@ namespace Blog.Core.Controllers
         // {
         //     return View();
         // }
+        [HttpGet]
+        [Route("Token")]
         public async Task<object> GetJwtStr(string name, string pass)
         {
-            TokenModelJwt tokenModelJwt = new TokenModelJwt()
+            string jwtStr=String.Empty;
+            bool suc=false;
+            if (name=="admins" && pass=="admins")
             {
-                Role = name,
-                Work = pass
+                TokenModelJwt tokenModel=new TokenModelJwt();
+                tokenModel.Uid=1;
+                tokenModel.Role="Admin";
+                jwtStr=JwtHelper.IssueJwt(tokenModel);
+                suc=true;
+            }
+            else
+            {
+                jwtStr="Login Fail!!";
+            }
+            var result=new
+            {
+                data=new {success=suc,token=jwtStr}
             };
-            var jwtStr = JwtHelper.IssueJwt(tokenModelJwt);
-            var suc = true;
-            return Ok(new
-            {
-                success = suc,
-                token = jwtStr
-            });
+            return  Json(result);
+      
         }
     }
 }

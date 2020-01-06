@@ -17,7 +17,7 @@ namespace Blog.Core.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    // [Authorize(policy:"Admin")]
+    [Authorize(policy:"Admin")]
     public class BlogController : ControllerBase
     {
         private readonly IAdvertisementServices advertisementServices;
@@ -30,12 +30,19 @@ namespace Blog.Core.Controllers
             this.blogArticleServices = blogArticleServices;
             this.redisCacheManager = redisCacheManager;
         }
+
         // GET: api/Blog
-        // [HttpGet]
-        // public IEnumerable<string> Get()
-        // {
-        //     return new string[] { "value1", "value2" };
-        // }
+        [HttpGet("{id}", Name = "Get")]
+        public async Task<Object> Get(int id)
+        {
+            var model = await blogArticleServices.getBlogDetails(id);
+            var data = new
+            {
+                success = true,
+                data = model
+            };
+            return data;
+        }
 
         /// <summary>
         /// Sum接口
@@ -76,6 +83,7 @@ namespace Blog.Core.Controllers
                 blogArticles = await this.blogArticleServices.getBlogs();
                 redisCacheManager.Set("Redis.Blog", blogArticles, TimeSpan.FromHours(2));
             }
+
             return blogArticles;
         }
 

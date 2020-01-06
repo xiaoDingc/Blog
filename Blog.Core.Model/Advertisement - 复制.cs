@@ -1,10 +1,8 @@
-﻿using SqlSugar;
-
-namespace Blog.Core.Model
+﻿namespace Blog.Core.Model
 {
     using System;
 
-    public class Advertisement:RootEntity
+    public class AdvertisementCopy
     {
         /// <summary>
         /// ID
@@ -35,14 +33,5 @@ namespace Blog.Core.Model
         /// 创建时间
         /// </summary>
         public DateTime Createdate { get; set; } = DateTime.Now;
-    }
-
-     public class RootEntity
-    {
-        /// <summary>
-        /// ID
-        /// </summary>
-        [SugarColumn(IsNullable = false, IsPrimaryKey = true, IsIdentity = true)]
-        public int Id { get; set; }
     }
 }

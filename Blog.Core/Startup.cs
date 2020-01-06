@@ -17,6 +17,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
+using AutoMapper;
+using Blog.Core.Model.Seed;
+using Blog.Core.Model.Seed.Blog.Core.Repository;
 
 namespace Blog.Core
 {
@@ -42,6 +45,12 @@ namespace Blog.Core
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddScoped<ICaching, MemoryCaching>(); //记得把缓存注入！！！
+            services.AddScoped<IRedisCacheManager, RedisCacheManager>(); //这里说下，如果是自己的项目，个人更建议使用单例模式 
+
+
+            services.AddAutoMapper(typeof(Startup)); //这是AutoMapper的2.0新特性
 
             #region Swagger
 
@@ -108,10 +117,32 @@ namespace Blog.Core
             var symmetricKeyAsBase64 = audienceConfig["Secret"];
             var keyByteArray = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyByteArray);
-
             var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
 
             #endregion
+
+            #region 跨域
+            services.AddCors(x=>
+            {
+                x.AddPolicy("LimitRequest",policy=>
+                {
+                    //端口后不加斜杠 
+                    // policy.WithOrigins(new string[]{"http://127.0.0.1:1818",
+                    //         "https://localhost:8080",
+                    //         "https://localhost:8021", "https://localhost:8081", "http://localhost:1818"})
+                    // policy.AllowAnyOrigin()
+                    //     .AllowAnyHeader()
+                    //     .AllowAnyMethod();
+                    policy
+                    .AllowAnyOrigin()//允许任何源
+                    .AllowAnyMethod()//允许任何方式
+                    .AllowAnyHeader()//允许任何头
+                    .AllowCredentials();//允许cookie
+                });
+            });
+            #endregion
+
+            #region token
 
             services.AddAuthentication(x =>
             {
@@ -131,38 +162,43 @@ namespace Blog.Core
                     ClockSkew = TimeSpan.Zero,
                     RequireExpirationTime = true,
                 };
-                o.Events=new JwtBearerEvents()
+                o.Events = new JwtBearerEvents()
                 {
-                    OnMessageReceived = context=>
+                    OnMessageReceived = context =>
                     {
                         if (context == null)
                         {
                             throw new ArgumentNullException(nameof(context));
                         }
-                        var res=  context.Request.Query["token"];
-                        return  Task.CompletedTask;
+
+                        var res = context.Request.Query["token"];
+                        return Task.CompletedTask;
                     }
                 };
             });
 
-            services.AddScoped<ICaching, MemoryCaching>();//记得把缓存注入！！！
-            services.AddScoped<IRedisCacheManager, RedisCacheManager>();//这里说下，如果是自己的项目，个人更建议使用单例模式 
+            #endregion
+
+            services.AddScoped<DBSeed>();
+            services.AddScoped<MyContext>();
+
+            #region autofac
             // 实例化autofac容器
             var builder = new ContainerBuilder();
-          
-            
+
+
             // builder.RegisterType(typeof(BlogCacheAOP));
             builder.RegisterType(typeof(BlogLogAOP));
             builder.RegisterType(typeof(BlogRedisCacheAOP));
-            var assemblyServices=Assembly.Load("Blog.Core.Services");
+            var assemblyServices = Assembly.Load("Blog.Core.Services");
 
             builder.RegisterAssemblyTypes(assemblyServices).AsImplementedInterfaces()
                 .InstancePerLifetimeScope()
                 .EnableInterfaceInterceptors()//引用Autofac.Extras.DynamicProxy;
-                // .InterceptedBy(typeof(BlogLogAOP));
-                .InterceptedBy(typeof(BlogLogAOP),typeof(BlogRedisCacheAOP));
+                                              // .InterceptedBy(typeof(BlogLogAOP));
+                .InterceptedBy(typeof(BlogLogAOP), typeof(BlogRedisCacheAOP));
 
-            var assemblyRepository=Assembly.Load("Blog.Core.Repository");
+            var assemblyRepository = Assembly.Load("Blog.Core.Repository");
             // builder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>();
             builder.RegisterAssemblyTypes(assemblyRepository).AsImplementedInterfaces();
 
@@ -170,7 +206,8 @@ namespace Blog.Core
             builder.Populate(services);
 
             // 使用已进行的组件登记创建新容器
-            var applicationContainer= builder.Build();
+            var applicationContainer = builder.Build(); 
+            #endregion
             return new AutofacServiceProvider(applicationContainer);
         }
 
@@ -193,6 +230,8 @@ namespace Blog.Core
 
                 #endregion
             }
+            app.UseCors("LimitRequest");
+
             app.UseAuthentication();
 
             app.UseMvc();
